@@ -173,18 +173,18 @@ fn transform_input (input : &str) -> i64 {
     };
 }
 
+/*
+*
+*
+*/
 fn calculator(operation : String, number1 : i64, number2: i64) -> i64 {
-    let _result = if "Addition".eq_ignore_ascii_case(operation.trim()) {
-        return number1 + number2;
-    } else if "Multiplication".eq_ignore_ascii_case(operation.trim()) {
-        return number1 * number2;
-    } else if "Subtraction".eq_ignore_ascii_case(operation.trim()) {
-        return number1 - number2;
-    } else if "Division".eq_ignore_ascii_case(operation.trim()) {
-        return number1 / number2;
-    } else if "Modulo".eq_ignore_ascii_case(operation.trim()) {
-        return number1 % number2;
-    } else {
-        return 0;
+    let oper = operation.trim().to_ascii_uppercase();
+    return match oper.as_str() {
+        "ADDITION" => number1 + number2,
+        "MULITIPLICATION" => number1 * number2,
+        "SUBTRACTION" => number1 - number2,
+        "DIVISION" => number1 / number2,
+        "MODULO" => number1 % number2,
+        _ => 0
     };
 }
