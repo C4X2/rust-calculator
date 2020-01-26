@@ -50,12 +50,14 @@ fn main() {
     io::stdin().read_line(&mut number1) // Returns a result type
         .expect("Failed to read given input!"); // lines seperated for clarity
 
-    /* This line prints the string we saved the user’s input in. The set of curly brackets, {},
-    *  is a placeholder: think of {} as little crab pincers that hold a value in place.
-    *  You can print more than one value using curly brackets: the first set of curly brackets
-    *  holds the first value listed after the format string, the second set holds the second value, and so on
-    */
-    //println!("You guessed: {}", guess);
+    while !verify_numeric_input(number1.as_mut_str()){
+        println!("Please enter your first number! Ensure it is a numberic value");
+
+        number1.clear();
+
+        io::stdin().read_line(&mut number1)
+            .expect("Failed to read given input!");
+    }
 
     println!("Please enter your second number!");
 
@@ -64,11 +66,22 @@ fn main() {
     io::stdin().read_line(&mut number2) // Returns a result type
         .expect("Failed to read given input!"); // lines seperated for clarity
 
+    while !verify_numeric_input(number2.as_mut_str()){
+        println!("Please enter your second number! Ensure it is a numberic value");
+
+        number2.clear();
+
+        io::stdin().read_line(&mut number2)
+            .expect("Failed to read given input!");
+    }
+
     let mut operation = String::new();
 
     /*
     * In Rust the type of an array does not have to be explicitly stated if since they have to share the same type.
     * If one were to explicitly state the array declarion it would be [&str; 5] where [TYPE; LENGTH].
+    * If this varible were to be assigned as a const (constant), then the type would have to be
+    * declared before hand.
     */
     let arr = ["Addition", "Subtraction", "Multiplication", "Division", "Modulo"];
 
@@ -84,8 +97,7 @@ fn main() {
     * bonds that value to the scoped variable i.
     *
     */
-    for i in arr.iter()
-    {
+    for i in arr.iter() {
         /*
         * push_str in Rust is very similar to the .append method in Java (from the StringBuffer class)
         */
@@ -97,68 +109,72 @@ fn main() {
 
     io::stdin().read_line(&mut operation) // Returns a result type
         .expect("Failed to read given input!"); // lines seperated for clarity
-    /*
-    while !verify_input(&operation){
-        println!("Please enter your intedend operation! Your choices are {}", words);
 
+    while !verify_operation(&operation) {
+        println!("Please enter your intedend operation again! Your choices are {}", words);
+
+        operation.clear();
 
         io::stdin().read_line(&mut operation) // Returns a result type
             .expect("Failed to read given input!"); // lines seperated for clarity
     }
-    */
-    let mut result = String::new();
-
-    for i in arr.iter()
-    {
-        if operation.trim().eq_ignore_ascii_case(i)
-        {
-            /*
-            * This assignment works becuase the String struct in rust can grow dynamically,
-            * so we don't have to worry about overflow of pre-allocated space.
-            */
-            result = i.to_string();
-        }
-    };
 
     /*
     * Gotta be honest didn't think functional composition would work in this way but it does,
     * the thing is if this were a 'real' program we would want to transform the String struct to a
     * i64 number immediately in order to save space.
     */
-    let final_result = calculator(operation, transform_input(number1.as_mut_str()), transform_input(number2.as_mut_str()));
+    let final_result = calculator(operation, transform_input(number1.as_mut_str()),
+                                                    transform_input(number2.as_mut_str()));
 
-    // Print the result
+    /* This line prints the string we saved the user’s input in. The set of curly brackets, {},
+    *  is a placeholder: think of {} as little crab pincers that hold a value in place.
+    *  You can print more than one value using curly brackets: the first set of curly brackets
+    *  holds the first value listed after the format string, the second set holds the second value, and so on
+    */
     println!("Your result is {}", final_result);
 }
+
 /*
 * We want to verify that the given user operation is actually a viable one.
 *
-*
 */
-fn verify_input(input : &str) -> bool {
-    // TODO make this variable flushable 
-    let mut match_pattern = input.trim();
-    println!("MatchPattern : {}", match_pattern);
-    return match match_pattern
-    {
-        "Addition"| "Subtraction"| "Multiplication"| "Division"| "Modulo" => true,
+fn verify_operation(input : &str) -> bool {
+    let match_pattern = input.trim().to_ascii_uppercase();
+    return match match_pattern.as_str() {
+        "ADDITION" | "SUBTRACTION" | "MULTIPLICATION" | "DIVISION" | "MODULO" => true,
         _ => false
     };
 }
+
 /*
+* Verifies that the given string can be converted into a integer primitive values.
+* Returns true if the value can be parsed into an integer value, false otherwise.
 *
+* @parameters input a string slice
+*/
+fn verify_numeric_input(input : &str) -> bool {
+    return match input.trim().parse::<i64>() {
+        Ok(_n) => true,
+        Err(_e) => false
+    };
+}
+
+/*
+* Turns a string value into an integer primitive value,
+* if the string cannot be parsed 0 is returned.
 *
-* @parameters
+* @parameters input a string slice
 */
 fn transform_input (input : &str) -> i64 {
     return match input.trim().parse::<i64>() {
         Ok(n) => n,
-        Err(e) => 0
+        Err(_e) => 0
     };
 }
 
 fn calculator(operation : String, number1 : i64, number2: i64) -> i64 {
-    let result = if "Addition".eq_ignore_ascii_case(operation.trim()) {
+    let _result = if "Addition".eq_ignore_ascii_case(operation.trim()) {
         return number1 + number2;
     } else if "Multiplication".eq_ignore_ascii_case(operation.trim()) {
         return number1 * number2;
